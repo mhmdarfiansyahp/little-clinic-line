@@ -28,3 +28,11 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Project rules (ClinicQueue)
+
+- Queue writes go through security-definer SQL functions (`register_patient`, `call_next`, `set_entry_status`); patients never read `queue_entries` directly — they use `get_ticket` with a private token, and the TV uses `get_queue_board` (codes only). Why: keeps patient names/phones private from anonymous visitors.
+- The clinic day is defined by `public.clinic_today()` in SQL and `clinicDate()` in `src/lib/queue.ts`; change both together. Why: daily number reset must agree between screens and database.
+- Live updates use the single-row `queue_signal` table as a doorbell (realtime + slow poll), then screens refetch. Why: anon screens can't subscribe to private tables.
+- Staff account creation/role/password/deletion runs in `src/lib/staff-admin.functions.ts` with an admin role check before using the service client; the first admin is created via `/setup` only while no admin exists.
+- Roles live in `user_roles` (`admin`, `staff`), never on profiles.
