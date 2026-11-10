@@ -34,6 +34,7 @@ function SetupPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const adminExists = useQuery({
     queryKey: ["admin-exists"],
@@ -51,6 +52,7 @@ function SetupPage() {
       return;
     }
     setLoading(true);
+    setFormError(null);
     try {
       await createAdmin({ data: { fullName, email, password } });
       const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
@@ -58,7 +60,9 @@ function SetupPage() {
       toast.success("Clinic set up! Add your doctors next.");
       navigate({ to: "/admin/doctors", replace: true });
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Setup failed.");
+      const msg = err instanceof Error ? err.message : "Setup failed.";
+      setFormError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -100,6 +104,9 @@ function SetupPage() {
                 <p className="text-xs text-muted-foreground">At least 8 characters.</p>
               </div>
             </div>
+            {formError && (
+              <p className="mt-4 rounded-xl bg-destructive/10 p-3 text-sm text-destructive">{formError}</p>
+            )}
             <Button type="submit" variant="hero" size="xl" className="mt-6 w-full" disabled={loading}>
               {loading && <Loader2 className="animate-spin" />} Create admin account
             </Button>
