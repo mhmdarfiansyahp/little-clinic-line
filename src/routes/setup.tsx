@@ -46,7 +46,10 @@ function SetupPage() {
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (password.length < 8) return toast.error("Password must be at least 8 characters.");
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters.");
+      return;
+    }
     setLoading(true);
     try {
       await createAdmin({ data: { fullName, email, password } });

@@ -121,7 +121,7 @@ function StaffAccountsPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <Select
-                    value={m.role ?? undefined}
+                    value={m.role ?? ""}
                     disabled={isMe || roleMutation.isPending}
                     onValueChange={(v) => roleMutation.mutate({ userId: m.id, role: v as Role })}
                   >
@@ -170,7 +170,10 @@ function AddStaffDialog({ open, onOpenChange, onDone }: { open: boolean; onOpenC
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const password = String(fd.get("password") ?? "");
-    if (password.length < 8) return toast.error("Password must be at least 8 characters.");
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters.");
+      return;
+    }
     setSaving(true);
     try {
       await create({
@@ -242,7 +245,10 @@ function ResetPasswordDialog({ member, onClose }: { member: Member | null; onClo
     e.preventDefault();
     if (!member) return;
     const password = String(new FormData(e.currentTarget).get("password") ?? "");
-    if (password.length < 8) return toast.error("Password must be at least 8 characters.");
+    if (password.length < 8) {
+      toast.error("Password must be at least 8 characters.");
+      return;
+    }
     setSaving(true);
     try {
       await reset({ data: { userId: member.id, password } });

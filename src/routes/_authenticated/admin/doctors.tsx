@@ -190,13 +190,19 @@ function DoctorDialog({
       specialty: fd.get("specialty") ?? "",
       room: fd.get("room") ?? "",
     });
-    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    if (!parsed.success) {
+      toast.error(parsed.error.issues[0]?.message ?? "Please check the form");
+      return;
+    }
     setSaving(true);
     const { error } = doctor
       ? await supabase.from("doctors").update(parsed.data).eq("id", doctor.id)
       : await supabase.from("doctors").insert(parsed.data);
     setSaving(false);
-    if (error) return toast.error(error.message);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success(doctor ? "Doctor updated" : "Doctor added");
     onSaved();
     onOpenChange(false);

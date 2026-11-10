@@ -25,7 +25,7 @@ interface TicketInfo {
 
 export const Route = createFileRoute("/ticket/$ticketId")({
   validateSearch: (search: Record<string, unknown>): { t: string } => ({
-    t: typeof search.t === "string" ? search.t : "",
+    t: typeof search["t"] === "string" ? search["t"] : "",
   }),
   head: () => ({
     meta: [

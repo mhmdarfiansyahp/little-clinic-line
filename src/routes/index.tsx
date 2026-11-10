@@ -47,7 +47,7 @@ function RegisterPage() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [doctorId, setDoctorId] = useState("");
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Partial<Record<"name" | "phone" | "doctorId", string>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [existing, setExisting] = useState<SavedTicket | null>(null);
 
@@ -70,8 +70,8 @@ function RegisterPage() {
     e.preventDefault();
     const parsed = schema.safeParse({ name, phone, doctorId });
     if (!parsed.success) {
-      const errs: Record<string, string> = {};
-      for (const issue of parsed.error.issues) errs[String(issue.path[0])] ??= issue.message;
+      const errs: Partial<Record<"name" | "phone" | "doctorId", string>> = {};
+      for (const issue of parsed.error.issues) errs[issue.path[0] as "name" | "phone" | "doctorId"] ??= issue.message;
       setErrors(errs);
       return;
     }

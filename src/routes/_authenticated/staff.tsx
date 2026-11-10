@@ -102,7 +102,7 @@ function StaffConsole() {
     setDoctorId((cur) => {
       if (cur && list.some((d) => d.id === cur)) return cur;
       if (saved && list.some((d) => d.id === saved)) return saved;
-      return list[0].id;
+      return list[0]!.id;
     });
   }, [doctors.data]);
 
@@ -263,7 +263,7 @@ function StaffConsole() {
             onClick={() => doctorId && callNext.mutate(doctorId)}
           >
             {callNext.isPending ? <Loader2 className="animate-spin" /> : <BellRing />}
-            {waiting.length === 0 ? "No one waiting" : `Call next · ${waiting[0].code}`}
+            {waiting.length === 0 ? "No one waiting" : `Call next · ${waiting[0]?.code ?? ""}`}
           </Button>
           {current && waiting.length > 0 && (
             <p className="text-center text-xs text-muted-foreground">
