@@ -27,3 +27,12 @@
 - Service role key only used on the server
 - Database schema versioned in repo (drizzle/migrations)
 - Production build succeeds
+
+## Fix log
+- #2 FIXED (partial) — max 3 active tickets per phone per day, enforced in register_patient
+  with an advisory lock. Verified: 5 parallel requests → 3 accepted, 2 rejected
+  (after/02-spam-limited.png). Remaining risk: attacker rotating random phone numbers
+  → recommend captcha (Cloudflare Turnstile) as a follow-up.
+- #9 FIXED — phone must contain at least 8 digits (server-side).
+- #6 ACCEPTED RISK — Lovable preview needs .env in the repo; it holds public values only.
+- #13 NOTED — Lovable bumped @lovable.dev/vite-tanstack-config without mentioning it.
