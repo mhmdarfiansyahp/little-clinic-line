@@ -1,23 +1,25 @@
 # ClinicQueue — Audit Findings
 
 ## Findings
-| # | Severity | Issue | Location | Status |
-|---|----------|-------|----------|--------|
-| 1 | Medium | Public setup page: anyone can become the first admin before the owner does; check-then-create is not atomic | src/lib/setup.functions.ts | Fixed |
-| 2 | Medium | Public registration has no rate limit or captcha; same phone can register many times a day (5 fake tickets A002–A006 in 1 second). "Already have a number" check is client-side only | register_patient (drizzle/migrations) | Fixed (partial) |
-| 3 | Low | No rollback if first-admin setup fails halfway; profiles upsert error ignored | src/lib/setup.functions.ts | Fixed |
-| 4 | Low | Long names (≤100 chars) overflow the ticket card | ticket page UI | Fixed |
-| 5 | Low | Previous-day tickets still show "Waiting" | ticket page | Fixed |
-| 6 | Low | .env committed to repo (only public keys today) | .env | Accepted risk |
-| 7 | Low | Deprecated createServerFn().inputValidator() (5 places) | src/lib/*.functions.ts | Fixed |
-| 8 | Low | Main JS bundle 562 kB (164 kB gzip) | build | Accepted |
-| 9 | Info | Phone regex accepts "------" | register_patient | Fixed |
-| 10 | Info | Redundant vite-tsconfig-paths plugin | vite.config.ts | Won't fix (managed by Lovable) |
-| 11 | Info | Placeholder uses a Thai name ("Somchai Jaidee") | src/routes/index.tsx | Fixed |
-| 12 | Info | Phone validation in the form (6+ digits) doesn't match the server rule (8+ digits) | src/routes/index.tsx | Fixed |
-| 13 | Info | AI change included an unmentioned dev dependency bump (vite-tanstack-config 2.26.5 → 2.27.1) | package.json | Verified |
+
+| #   | Severity | Issue                                                                                                                                                                                | Location                              | Status                         |
+| --- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------- | ------------------------------ |
+| 1   | Medium   | Public setup page: anyone can become the first admin before the owner does; check-then-create is not atomic                                                                          | src/lib/setup.functions.ts            | Fixed                          |
+| 2   | Medium   | Public registration has no rate limit or captcha; same phone can register many times a day (5 fake tickets A002–A006 in 1 second). "Already have a number" check is client-side only | register_patient (drizzle/migrations) | Fixed (partial)                |
+| 3   | Low      | No rollback if first-admin setup fails halfway; profiles upsert error ignored                                                                                                        | src/lib/setup.functions.ts            | Fixed                          |
+| 4   | Low      | Long names (≤100 chars) overflow the ticket card                                                                                                                                     | ticket page UI                        | Fixed                          |
+| 5   | Low      | Previous-day tickets still show "Waiting"                                                                                                                                            | ticket page                           | Fixed                          |
+| 6   | Low      | .env committed to repo (only public keys today)                                                                                                                                      | .env                                  | Accepted risk                  |
+| 7   | Low      | Deprecated createServerFn().inputValidator() (5 places)                                                                                                                              | src/lib/*.functions.ts                | Fixed                          |
+| 8   | Low      | Main JS bundle 562 kB (164 kB gzip)                                                                                                                                                  | build                                 | Accepted                       |
+| 9   | Info     | Phone regex accepts "------"                                                                                                                                                         | register_patient                      | Fixed                          |
+| 10  | Info     | Redundant vite-tsconfig-paths plugin                                                                                                                                                 | vite.config.ts                        | Won't fix (managed by Lovable) |
+| 11  | Info     | Placeholder uses a Thai name ("Somchai Jaidee")                                                                                                                                      | src/routes/index.tsx                  | Fixed                          |
+| 12  | Info     | Phone validation in the form (6+ digits) doesn't match the server rule (8+ digits)                                                                                                   | src/routes/index.tsx                  | Fixed                          |
+| 13  | Info     | AI change included an unmentioned dev dependency bump (vite-tanstack-config 2.26.5 → 2.27.1)                                                                                         | package.json                          | Verified                       |
 
 ## Passed checks
+
 - Patient data cannot be read without login (RLS)
 - Doctors cannot be modified without login
 - Queue entries cannot be inserted directly into the table
@@ -31,11 +33,15 @@
 - Production build succeeds
 
 ## Fix log
+
 - #1 FIXED — /setup now requires a secret SETUP_TOKEN (stored in Lovable Secrets, compared
   in constant time). Setup is disabled entirely if the secret is missing.
   Verified: code review + build; /setup still shows "Already set up"
   (after/01-setup-locked-with-token.png).
-  Full end-to-end test needs a fresh database (no admin) — pending.
+  End-to-end verified on a fresh Supabase project: wrong code → "Invalid setup code",
+  correct code → admin created and signed in, /setup locked afterwards, exactly one
+  admin row in user_roles (after/01b–01f). Admin-only features (create staff) work
+  with the project's own secret key (after/06, after/07).
   Residual risk: two people who both know the code submitting at the same second
   could create two admins.
 - #2 FIXED (partial) — max 3 active tickets per phone per day, enforced in register_patient
@@ -65,5 +71,6 @@
   build still passes after the bump.
 
 ## AI change verification
+
 - Lovable "add secret" produced 2 commits touching only .lovable/north-star/north-star.md
   (app goal metadata). No code changed and no secret value written to the repo — verified.
