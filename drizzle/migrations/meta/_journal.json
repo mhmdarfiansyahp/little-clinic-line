@@ -8,6 +8,13 @@
       "when": 1794332656486,
       "tag": "0000_clinicqueue_schema",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794644885370,
+      "tag": "0001_limit_active_tickets_per_phone",
+      "breakpoints": true
     }
   ]
 }
