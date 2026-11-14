@@ -6,15 +6,15 @@
 | 1 | Medium | Public setup page: anyone can become the first admin before the owner does; check-then-create is not atomic | src/lib/setup.functions.ts | Fixed |
 | 2 | Medium | Public registration has no rate limit or captcha; same phone can register many times a day (5 fake tickets A002–A006 in 1 second). "Already have a number" check is client-side only | register_patient (drizzle/migrations) | Fixed (partial) |
 | 3 | Low | No rollback if first-admin setup fails halfway; profiles upsert error ignored | src/lib/setup.functions.ts | Fixed |
-| 4 | Low | Long names (≤100 chars) overflow the ticket card | ticket page UI | Open |
-| 5 | Low | Previous-day tickets still show "Waiting" | ticket page / get_ticket | Open |
+| 4 | Low | Long names (≤100 chars) overflow the ticket card | ticket page UI | Fixed |
+| 5 | Low | Previous-day tickets still show "Waiting" | ticket page | Fixed |
 | 6 | Low | .env committed to repo (only public keys today) | .env | Accepted risk |
-| 7 | Low | Deprecated createServerFn().inputValidator() (5 places) | src/lib/*.functions.ts | Open |
-| 8 | Low | Main JS bundle 562 kB (164 kB gzip) | build | Open |
+| 7 | Low | Deprecated createServerFn().inputValidator() (5 places) | src/lib/*.functions.ts | Fixed |
+| 8 | Low | Main JS bundle 562 kB (164 kB gzip) | build | Accepted |
 | 9 | Info | Phone regex accepts "------" | register_patient | Fixed |
-| 10 | Info | Redundant vite-tsconfig-paths plugin | vite.config.ts | Open |
-| 11 | Info | Placeholder uses a Thai name ("Somchai Jaidee") | src/routes/index.tsx | Open |
-| 12 | Info | Phone validation in the form (6+ digits) doesn't match the server rule (8+ digits) | src/routes/index.tsx | Open |
+| 10 | Info | Redundant vite-tsconfig-paths plugin | vite.config.ts | Won't fix (managed by Lovable) |
+| 11 | Info | Placeholder uses a Thai name ("Somchai Jaidee") | src/routes/index.tsx | Fixed |
+| 12 | Info | Phone validation in the form (6+ digits) doesn't match the server rule (8+ digits) | src/routes/index.tsx | Fixed |
 | 13 | Info | AI change included an unmentioned dev dependency bump (vite-tanstack-config 2.26.5 → 2.27.1) | package.json | Verified |
 
 ## Passed checks
@@ -43,18 +43,27 @@
   (after/02-spam-limited.png). Remaining risk: attacker rotating random phone numbers
   → recommend captcha (Cloudflare Turnstile) as a follow-up.
 - #3 FIXED — if profile or role creation fails, the new auth user is deleted (no orphan accounts).
-- #6 ACCEPTED RISK — removing .env from the repo broke Lovable's preview, so it was restored.
-  It holds public values only (URL + publishable key). Secrets go in Lovable Secrets.
-  .env.example added.
-- #9 FIXED — phone must contain at least 8 digits (server-side).
-- #13 VERIFIED — Lovable bumped @lovable.dev/vite-tanstack-config without mentioning it;
-  build still passes after the bump.
-- Lovable "add secret" produced 2 commits touching only .lovable/north-star/north-star.md
-  (app goal metadata). No code changed and no secret value written to the repo — verified.
-  - #4 FIXED — long names truncate with "…" in the ticket header; "Today" label stays visible
+- #4 FIXED — long names truncate with "…" in the ticket header; "Today" label stays visible
   (after/04-long-name-truncated.png).
 - #5 FIXED — previous-day tickets show "This number has expired", an "Expired" badge,
   and no "Updates automatically" note (after/05-expired-ticket.png).
+- #6 ACCEPTED RISK — removing .env from the repo broke Lovable's preview, so it was restored.
+  It holds public values only (URL + publishable key). Secrets go in Lovable Secrets.
+  .env.example added.
+- #7 FIXED — replaced deprecated createServerFn().inputValidator() with .validator()
+  in 5 places; build has no deprecation warnings.
+- #8 ACCEPTED — routes are already code-split per page (staff, admin, display, setup, ticket).
+  The 562 kB shared chunk is React + router + Supabase client (164 kB gzip). Further splitting
+  would require changing Lovable-managed build config; not worth the risk.
+- #9 FIXED — phone must contain at least 8 digits (server-side).
+- #10 WON'T FIX — vite-tsconfig-paths is injected by @lovable.dev/vite-tanstack-config
+  (see vite.config.ts); the project must not add or remove these plugins manually.
 - #11 FIXED — placeholder changed to an Indonesian name ("Budi Santoso").
 - #12 FIXED — the form now requires 8+ digits, matching the server rule
   (after/12-phone-validation-form.png).
+- #13 VERIFIED — Lovable bumped @lovable.dev/vite-tanstack-config without mentioning it;
+  build still passes after the bump.
+
+## AI change verification
+- Lovable "add secret" produced 2 commits touching only .lovable/north-star/north-star.md
+  (app goal metadata). No code changed and no secret value written to the repo — verified.
