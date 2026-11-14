@@ -19,7 +19,8 @@ export const Route = createFileRoute("/")({
       { title: "Get your queue number — ClinicQueue" },
       {
         name: "description",
-        content: "Register with your name and phone, choose your doctor and get a queue number in seconds.",
+        content:
+          "Register with your name and phone, choose your doctor and get a queue number in seconds.",
       },
       { property: "og:title", content: "Get your queue number — ClinicQueue" },
       {
@@ -38,7 +39,8 @@ const schema = z.object({
   phone: z
     .string()
     .trim()
-    .regex(/^[0-9+() -]{6,20}$/, "Please enter a valid phone number"),
+    .regex(/^[0-9+() -]{6,20}$/, "Please enter a valid phone number")
+    .refine((v) => v.replace(/\D/g, "").length >= 8, "Please enter a valid phone number"),
   doctorId: z.string().uuid("Please choose a doctor"),
 });
 
@@ -71,7 +73,8 @@ function RegisterPage() {
     const parsed = schema.safeParse({ name, phone, doctorId });
     if (!parsed.success) {
       const errs: Partial<Record<"name" | "phone" | "doctorId", string>> = {};
-      for (const issue of parsed.error.issues) errs[issue.path[0] as "name" | "phone" | "doctorId"] ??= issue.message;
+      for (const issue of parsed.error.issues)
+        errs[issue.path[0] as "name" | "phone" | "doctorId"] ??= issue.message;
       setErrors(errs);
       return;
     }
@@ -89,7 +92,11 @@ function RegisterPage() {
     }
     const t = data as { ticket_id: string; access_token: string; code: string };
     saveTicket({ id: t.ticket_id, token: t.access_token, code: t.code, date: clinicDate() });
-    navigate({ to: "/ticket/$ticketId", params: { ticketId: t.ticket_id }, search: { t: t.access_token } });
+    navigate({
+      to: "/ticket/$ticketId",
+      params: { ticketId: t.ticket_id },
+      search: { t: t.access_token },
+    });
   }
 
   return (
@@ -156,7 +163,7 @@ function RegisterPage() {
                   maxLength={100}
                   onChange={(e) => setName(e.target.value)}
                   className="h-12 rounded-xl text-base"
-                  placeholder="e.g. Somchai Jaidee"
+                  placeholder="e.g. Budi Santoso"
                 />
                 {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
               </div>
@@ -202,16 +209,23 @@ function RegisterPage() {
                           <span
                             className={cn(
                               "grid size-10 shrink-0 place-items-center rounded-lg",
-                              selected ? "bg-primary text-primary-foreground" : "bg-secondary text-primary",
+                              selected
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-secondary text-primary",
                             )}
                           >
-                            {selected ? <Check className="size-5" /> : <Stethoscope className="size-5" />}
+                            {selected ? (
+                              <Check className="size-5" />
+                            ) : (
+                              <Stethoscope className="size-5" />
+                            )}
                           </span>
                           <span className="min-w-0 flex-1">
                             <span className="block truncate font-semibold">{d.name}</span>
                             <span className="block truncate text-sm text-muted-foreground">
-                              {[d.specialty, d.room && `Room ${d.room}`].filter(Boolean).join(" · ") ||
-                                "General"}
+                              {[d.specialty, d.room && `Room ${d.room}`]
+                                .filter(Boolean)
+                                .join(" · ") || "General"}
                             </span>
                           </span>
                         </button>
@@ -227,7 +241,13 @@ function RegisterPage() {
               </fieldset>
             </div>
 
-            <Button type="submit" variant="hero" size="xl" className="mt-7 w-full" disabled={submitting}>
+            <Button
+              type="submit"
+              variant="hero"
+              size="xl"
+              className="mt-7 w-full"
+              disabled={submitting}
+            >
               {submitting ? <Loader2 className="animate-spin" /> : <Ticket />}
               Get my queue number
             </Button>

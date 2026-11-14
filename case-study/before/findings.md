@@ -51,3 +51,10 @@
   build still passes after the bump.
 - Lovable "add secret" produced 2 commits touching only .lovable/north-star/north-star.md
   (app goal metadata). No code changed and no secret value written to the repo — verified.
+  - #4 FIXED — long names truncate with "…" in the ticket header; "Today" label stays visible
+  (after/04-long-name-truncated.png).
+- #5 FIXED — previous-day tickets show "This number has expired", an "Expired" badge,
+  and no "Updates automatically" note (after/05-expired-ticket.png).
+- #11 FIXED — placeholder changed to an Indonesian name ("Budi Santoso").
+- #12 FIXED — the form now requires 8+ digits, matching the server rule
+  (after/12-phone-validation-form.png).
