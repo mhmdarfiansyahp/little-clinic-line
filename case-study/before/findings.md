@@ -74,3 +74,19 @@
 
 - Lovable "add secret" produced 2 commits touching only .lovable/north-star/north-star.md
   (app goal metadata). No code changed and no secret value written to the repo — verified.
+
+## Deployment
+
+- Backend moved from Lovable Cloud to a self-owned Supabase project (Postgres + Auth + Realtime).
+  Schema applied from drizzle/migrations (0000 + 0001); verified register_patient includes the 0001 fix.
+- Frontend + server functions deployed to Cloudflare Workers with Wrangler
+  (preset cloudflare-module, built with Lovable's own config — no build changes needed).
+- Secrets (SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, SUPABASE_SERVICE_ROLE_KEY, SETUP_TOKEN) stored
+  as encrypted Cloudflare secrets; local values live in .env.local (git-ignored). Repo .env still
+  points to Lovable Cloud so Lovable's preview keeps working.
+- Why move: Lovable Cloud does not expose the service role key, so admin features (first-admin setup,
+  staff accounts) could not run outside Lovable. On the own Supabase project they work.
+- Live: https://mhmdarfiansyahp-little-clinic-line.arfiansyah.workers.dev
+- Verified live (after/live-01 … live-07): patient registration, ticket, /setup locked, admin login,
+  staff accounts (service role key), call next with realtime ticket update, waiting-room display.
+- Note: Supabase region is ap-southeast-2 (Sydney); a real clinic in Indonesia should use Singapore.
