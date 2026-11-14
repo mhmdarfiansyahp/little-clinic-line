@@ -49,3 +49,5 @@
 - #9 FIXED — phone must contain at least 8 digits (server-side).
 - #13 VERIFIED — Lovable bumped @lovable.dev/vite-tanstack-config without mentioning it;
   build still passes after the bump.
+- Lovable "add secret" produced 2 commits touching only .lovable/north-star/north-star.md
+  (app goal metadata). No code changed and no secret value written to the repo — verified.
