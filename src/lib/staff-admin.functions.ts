@@ -18,7 +18,7 @@ async function assertAdmin(supabase: AuthedSupabase, userId: string) {
 
 export const createStaffAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         fullName: z.string().trim().min(1).max(100),
@@ -49,7 +49,7 @@ export const createStaffAccount = createServerFn({ method: "POST" })
 
 export const updateStaffRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ userId: z.string().uuid(), role: roleSchema }).parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -66,7 +66,7 @@ export const updateStaffRole = createServerFn({ method: "POST" })
 
 export const resetStaffPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z.object({ userId: z.string().uuid(), password: z.string().min(8).max(72) }).parse(input),
   )
   .handler(async ({ data, context }) => {
@@ -79,7 +79,7 @@ export const resetStaffPassword = createServerFn({ method: "POST" })
 
 export const removeStaffAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: unknown) => z.object({ userId: z.string().uuid() }).parse(input))
+  .validator((input: unknown) => z.object({ userId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
     await assertAdmin(context.supabase as unknown as AuthedSupabase, context.userId);
     if (data.userId === context.userId) throw new Error("You can't remove your own account.");

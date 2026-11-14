@@ -11,7 +11,7 @@ function safeEqual(a: string, b: string) {
 
 // Public route, but locked behind a secret SETUP_TOKEN and only while the clinic has no admin.
 export const createFirstAdmin = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) =>
+  .validator((input: unknown) =>
     z
       .object({
         setupCode: z.string().trim().min(1).max(200),
