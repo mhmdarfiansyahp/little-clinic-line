@@ -31,6 +31,7 @@ function SetupPage() {
   const navigate = useNavigate();
   const createAdmin = useServerFn(createFirstAdmin);
   const [fullName, setFullName] = useState("");
+  const [setupCode, setSetupCode] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -54,7 +55,7 @@ function SetupPage() {
     setLoading(true);
     setFormError(null);
     try {
-      await createAdmin({ data: { fullName, email, password } });
+      await createAdmin({ data: { setupCode, fullName, email, password } });
       const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password });
       if (error) throw error;
       toast.success("Clinic set up! Add your doctors next.");
@@ -73,12 +74,16 @@ function SetupPage() {
       <PublicHeader />
       <main className="mx-auto w-full max-w-md px-5 pb-16 pt-6 sm:pt-12">
         {adminExists.isLoading ? (
-          <div className="grid place-items-center py-20"><Loader2 className="size-6 animate-spin" /></div>
+          <div className="grid place-items-center py-20">
+            <Loader2 className="size-6 animate-spin" />
+          </div>
         ) : adminExists.data ? (
           <div className="rounded-3xl border bg-card p-8 text-center shadow-soft">
             <h1 className="text-2xl font-bold">Already set up</h1>
             <p className="mt-2 text-muted-foreground">This clinic already has an admin.</p>
-            <Button asChild variant="hero" className="mt-6"><Link to="/auth">Go to sign in</Link></Button>
+            <Button asChild variant="hero" className="mt-6">
+              <Link to="/auth">Go to sign in</Link>
+            </Button>
           </div>
         ) : (
           <form onSubmit={onSubmit} className="rounded-3xl border bg-card p-6 shadow-lift sm:p-8">
@@ -91,23 +96,69 @@ function SetupPage() {
             </p>
             <div className="mt-6 space-y-4">
               <div className="space-y-2">
+                <Label htmlFor="setupCode">Setup code</Label>
+                <Input
+                  id="setupCode"
+                  type="password"
+                  required
+                  autoComplete="off"
+                  value={setupCode}
+                  onChange={(e) => setSetupCode(e.target.value)}
+                  className="h-12 rounded-xl text-base"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Given to you by whoever deployed ClinicQueue.
+                </p>
+              </div>
+              <div className="space-y-2">
                 <Label htmlFor="fullName">Your name</Label>
-                <Input id="fullName" required maxLength={100} value={fullName} onChange={(e) => setFullName(e.target.value)} className="h-12 rounded-xl text-base" />
+                <Input
+                  id="fullName"
+                  required
+                  maxLength={100}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className="h-12 rounded-xl text-base"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className="h-12 rounded-xl text-base" />
+                <Input
+                  id="email"
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="h-12 rounded-xl text-base"
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" required minLength={8} autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} className="h-12 rounded-xl text-base" />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="h-12 rounded-xl text-base"
+                />
                 <p className="text-xs text-muted-foreground">At least 8 characters.</p>
               </div>
             </div>
             {formError && (
-              <p className="mt-4 rounded-xl bg-destructive/10 p-3 text-sm text-destructive">{formError}</p>
+              <p className="mt-4 rounded-xl bg-destructive/10 p-3 text-sm text-destructive">
+                {formError}
+              </p>
             )}
-            <Button type="submit" variant="hero" size="xl" className="mt-6 w-full" disabled={loading}>
+            <Button
+              type="submit"
+              variant="hero"
+              size="xl"
+              className="mt-6 w-full"
+              disabled={loading}
+            >
               {loading && <Loader2 className="animate-spin" />} Create admin account
             </Button>
           </form>
